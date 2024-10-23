@@ -1,7 +1,7 @@
-1. 预训练模型：
-   1. 下载RML2016a数据集与与RML2016a数据集对应的CWTdata数据集。并放置于正确位置。
-   2. 打开Pretrain文件夹
-   3. 运行main.py
-2. 不同模型的比较试验
-   1. 打开Test and Comparison文件夹
-   2. 运行mian.py
+1. Pre-trained Model:
+   1. Download the RML2016a dataset and the corresponding CWTdata dataset. Place them in the correct location.
+   2. Open the Pretrain folder.
+   3. Run main.py.
+2. Comparison Experiments of Different Models:
+   1. Open the Test and Comparison folder.
+   2. Run main.py.
