@@ -1,4 +1,4 @@
-1. Generate the CWT dataset:
+1. Prepare the data:
    1. Download the RML2016a dataset.
    2. Run the generate_CWTdataset.ipynb file to generate the CWTdata.pkl.
 3. Pre-trained Model: 
