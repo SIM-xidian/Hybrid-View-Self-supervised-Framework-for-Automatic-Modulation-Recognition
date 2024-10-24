@@ -18,7 +18,7 @@ import time
 
 from fvcore.nn import FlopCountAnalysis
 
-def train(model_name,classifier,epoches,train_loader,test_loader,save_path,model=None,finetunning = False,converter = None):
+def train(model_name,classifier,epoches,train_loader,val_loader,save_path,model=None,finetunning = False,converter = None):
 
     if model_name == 'HVSF' or model_name == 'HVSF_wo_finetunning':
         if finetunning:
@@ -46,7 +46,7 @@ def train(model_name,classifier,epoches,train_loader,test_loader,save_path,model
                     p_bar.update()
             time2 = time.time()
             if epoch % 10 == 0 and epoch != 0:
-                acc = test(model_name,classifier,test_loader,model = model,converter = converter)
+                acc = test(model_name,classifier,val_loader,model = model,converter = converter)
                 if acc>max_acc:
                     print("max_acc:",acc)
                     torch.save(model.state_dict(),os.path.join(save_path,'model_state.pth'))
@@ -54,7 +54,7 @@ def train(model_name,classifier,epoches,train_loader,test_loader,save_path,model
                     max_acc = acc
         allocated_memory = torch.cuda.memory_allocated() / 1024 ** 2  # MB
         cached_memory = torch.cuda.memory_reserved() / 1024 ** 2  # MB
-        acc = test(model_name,classifier,test_loader,model = model,converter = converter)
+        acc = test(model_name,classifier,val_loader,model = model,converter = converter)
         if acc>max_acc:
             print("max_acc:",acc)
             torch.save(model.state_dict(),os.path.join(save_path,'model_state.pth'))
@@ -114,14 +114,14 @@ def train(model_name,classifier,epoches,train_loader,test_loader,save_path,model
                     p_bar.update()
             time2 = time.time()
             if epoch % 100 == 0 and epoch != 0:
-                acc = test(model_name,classifier,test_loader)
+                acc = test(model_name,classifier,val_loader)
                 if acc>max_acc:
                     print("max_acc:",acc)
                     torch.save(classifier.state_dict(),os.path.join(save_path,'classifier_state.pth'))
                     max_acc = acc
         allocated_memory = torch.cuda.memory_allocated() / 1024 ** 2  # MB
         cached_memory = torch.cuda.memory_reserved() / 1024 ** 2  # MB
-        acc = test(model_name,classifier,test_loader)
+        acc = test(model_name,classifier,val_loader)
         if acc>max_acc:
             print("max_acc:",acc)
             torch.save(classifier.state_dict(),os.path.join(save_path,'classifier_state.pth'))
@@ -247,18 +247,11 @@ for rate in [0.01,0.05,0.1,0.3,0.5,0.6]:
                 classifier.train()
                 converter = video_Converter(bsz,14)
                 if model_name == 'HVSF':
-                    train(model_name,classifier,50,train_loader,test_loader,save_path,model=model,finetunning = True,converter  = converter)
+                    train(model_name,classifier,50,train_loader,val_loader,save_path,model=model,finetunning = True,converter  = converter)
                 else:
-                    train(model_name,classifier,50,train_loader,test_loader,save_path,model=model,finetunning = False,converter  = converter)
+                    train(model_name,classifier,50,train_loader,val_loader,save_path,model=model,finetunning = False,converter  = converter)
                 test(model_name, classifier, test_loader,snrs, snr_indexs, save_path, final = True, model=model, converter = converter)
             else:
                 classifier = get_class(model_name,(2,128),11).cuda()
-                train(model_name,classifier,50,train_loader,test_loader,save_path)
+                train(model_name,classifier,50,train_loader,val_loader,save_path)
                 test(model_name, classifier, test_loader,snrs, snr_indexs, save_path, final = True)
-
-
-
-
-
-
-
