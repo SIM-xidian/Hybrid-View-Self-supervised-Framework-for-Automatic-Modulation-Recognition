@@ -1,3 +1,4 @@
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -41,7 +42,7 @@ def pretrain(model,projection_head,epoches,converter,optimizer,data_loader,save_
     torch.save(model.state_dict(),os.path.join(save_path,'model_state.pth'))
     torch.save(projection_head.state_dict(),os.path.join(save_path,'projection_head_state.pth'))
         
-def classifier_train(model,classifier,epoches,converter,optimizer,train_loader,test_loader,save_path):
+def classifier_train(model,classifier,epoches,converter,optimizer,train_loader,val_loader,save_path):
     max_acc = 0
     for epoch in range(epoches):
         with tqdm(total=len(train_loader)) as p_bar:
@@ -60,14 +61,14 @@ def classifier_train(model,classifier,epoches,converter,optimizer,train_loader,t
                 p_bar.set_description("classifier_train: epoch:{} batch_idx:{} loss:{:02f}".format(epoch, batch_idx, loss))
                 p_bar.update()
         if epoch % 4 == 0 and epoch != 0:
-            acc = test(model,classifier,test_loader)
+            acc = test(model,classifier,val_loader)
             if acc>max_acc:
                 print("max_acc:",acc)
                 torch.save(model.state_dict(),os.path.join(save_path,'model_state.pth'))
                 torch.save(classifier.state_dict(),os.path.join(save_path,'classifier_state.pth'))
                 max_acc = acc
 
-    acc = test(model,classifier,test_loader)
+    acc = test(model,classifier,val_loader)
     if acc>max_acc:
         print("max_acc:",acc)
         torch.save(model.state_dict(),os.path.join(save_path,'model_state.pth'))
@@ -145,7 +146,7 @@ for epoch in [5,10,15,20,50,100]:
     optimizer = torch.optim.Adam(list(model.parameters())+list(projection_head.parameters()),lr = 0.0005)    
     pretrain(model,projection_head,epoch,converter,optimizer,train_loader,save_path)
     optimizer = torch.optim.Adam(classifier.parameters(), lr = 0.001)
-    classifier_train(model,classifier,20,converter,optimizer,ctrain_loader,ctest_loader,save_path)
+    classifier_train(model,classifier,20,converter,optimizer,ctrain_loader,cval_loader,save_path)
     test(model,classifier,ctest_loader,csnrs,csnr_indexs,save_path,final = True)
 
 
